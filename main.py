@@ -50,7 +50,7 @@ def do_login_loop():
 
     match int(choice):
       case 1:
-        print('User')
+        do_user_loop()
 
       case 2: 
         print('Admin')
@@ -74,6 +74,58 @@ def ask_login_menu():
 def print_login_error():
   print()
   print('Sorry, that is not a valid input. Please enter 1, 2, or 3.')
+
+def do_user_loop():
+  while True:
+    choice = ask_user_menu()
+
+    if not choice.isdigit():
+      print_user_error()
+      continue
+
+    match int(choice):
+      case 1:
+        # To be implemented later
+        print('Checking balance...')
+
+      case 2:
+        # To be implemented later 
+        print('Depositing...')
+
+      case 3:
+        # To be implemented later
+        print('Withdrawing...')
+
+      case 4:
+        # To be implemented later
+        print('Modifying...')
+
+      case 5:
+        # To be implemented later
+        print('Deleting...')
+
+      case 6:
+        break
+
+      case _:
+        print_user_error()
+
+def ask_user_menu():
+  print()
+  print('What would you like to do?')
+  print('1. Check balance\n' +
+        '2. Deposit\n' +
+        '3. Withdraw\n' +
+        '4. Modify account\n' +
+        '5. Delete account\n' +
+        '6. Exit\n')
+  
+  choice = input('Enter your choice (1-6) here: ')
+  return choice
+
+def print_user_error():
+  print()
+  print('Sorry, that is not a valid input. Please enter 1, 2, 3, 4, 5, or 6.')
 
 def print_exit_message():
   print()
