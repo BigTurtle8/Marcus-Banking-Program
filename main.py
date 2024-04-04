@@ -1,3 +1,7 @@
+from sql_functions import *
+
+test()
+
 def main():
   print('Welcome to Turtle Banking!')
   
