@@ -20,4 +20,5 @@ def test():
   for item in cursor:
     print(item)
 
+  cursor.close()
   connection.close()
