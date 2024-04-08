@@ -6,8 +6,8 @@ load_dotenv()
 
 def test():
   print(f'{check_balance(1):.2f}')
-  print(f'{deposit(100, 1):.2f}')
-  print(f'{withdraw(2000, 1):.2f}')
+  print(f'{deposit(1, 100):.2f}')
+  print(f'{withdraw(1, 2000):.2f}')
 
   created_account = create_account('Test Schmo', 0)
   print(f'{created_account}')
@@ -49,7 +49,7 @@ def check_balance(id):
 # of money and returns NEW balance. 
 # if doesn't exist, returns None
 # (assumes correct data types)
-def deposit(amount, id):
+def deposit(id, amount):
   current_bal = check_balance(id)
   
   if current_bal is None:
@@ -84,7 +84,7 @@ def deposit(amount, id):
 #  if is enough, removes that much money and returns NEW balance
 # if account doesn't exist, returns None
 # (assumes correct data types)
-def withdraw(amount, id):
+def withdraw(id, amount):
   current_bal = check_balance(id)
   
   if current_bal is None:
