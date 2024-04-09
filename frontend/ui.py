@@ -1,4 +1,4 @@
-from sql_functions import *
+from backend.sql_functions import *
 
 def run():
   print('Welcome to Turtle Banking!')

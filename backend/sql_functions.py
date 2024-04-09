@@ -1,7 +1,7 @@
 import mysql.connector
 from dotenv import load_dotenv
 import os
-from utils import hash_salt
+from backend.utils import hash_salt
 
 load_dotenv()
 

@@ -3,8 +3,8 @@ import mysql.connector
 from dotenv import load_dotenv
 import os
 import random as rand
-from sql_functions import check_balance, deposit, withdraw, create_account, delete_account, modify_account
-from utils import hash_salt
+from backend.sql_functions import check_balance, deposit, withdraw, create_account, delete_account, modify_account
+from backend.utils import hash_salt
 
 class SQLTestCases(unittest.TestCase):
   def setUp(self):
