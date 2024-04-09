@@ -1,0 +1,12 @@
+# Moral of the story, create the .gitignore before adding other files!
+# With assistance from https://www.toptal.com/developers/gitignore/api/python
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment
+.env
+.venv
+venv/
