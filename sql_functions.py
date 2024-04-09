@@ -1,6 +1,7 @@
 import mysql.connector
 from dotenv import load_dotenv
 import os
+from utils import hash_salt
 
 load_dotenv()
 
@@ -28,17 +29,18 @@ def check_balance(id):
 
   cursor = connection.cursor()
 
-  query = ("SELECT * FROM account;")
+  query = (f"""
+           SELECT balance FROM account
+           WHERE id={id};
+           """
+  )
 
   cursor.execute(query)
 
   bal = None
 
   for item in cursor:
-    item_id = item[0]
-
-    if item_id == id:
-      bal = item[2]
+    bal = item[0]
 
   cursor.close()
   connection.close()
@@ -117,14 +119,16 @@ def withdraw(id, amount):
   return current_bal - amount
 
 # creates new account with inputted
-# username and admin rights and 0 balance
+# username and admin rights, hashed/salted password and 0 balance
 # returns tuple of inputted row 
 #  note: admin rights accepts 1/0 or true/false
 # ({id}, {username}, {balance}, {is_admin})
 # (assumes correct data types)
-def create_account(username, is_admin):
+def create_account(username, password, is_admin):
   if isinstance(is_admin, bool):
     is_admin = 1 if is_admin else 0
+
+  password_hash = hash_salt(password)
 
   connection = mysql.connector.connect( \
     user=os.environ.get('SQL_USER'), \
@@ -135,8 +139,8 @@ def create_account(username, is_admin):
   cursor = connection.cursor()
 
   add_query = (f"""
-                INSERT INTO account(username, balance, is_admin)
-                VALUES("{username}", 0.00, {is_admin});
+                INSERT INTO account(username, password_hash, balance, is_admin)
+                VALUES("{username}", {password_hash}, 0.00, {is_admin});
                 """
   )
 
@@ -157,7 +161,7 @@ def create_account(username, is_admin):
   connection.commit()
   connection.close()
 
-  return (added_id, username, 0.00, is_admin)
+  return (added_id, username, password_hash, 0.00, is_admin)
 
 # deletes account with associated id
 # returns account info if successfully deleted
@@ -193,6 +197,8 @@ def delete_account(id):
   del_account = None
   for item in cursor:
     del_account = item
+
+  ret = del_account[:2] + ('0x' + del_account[2].hex(),) + del_account[3:]
   
   cursor.execute(rem_query)
   cursor.close()
@@ -200,13 +206,17 @@ def delete_account(id):
   connection.commit()
   connection.close()
 
-  return del_account
+  return ret
 
-# modifies account username
 # given account id
+# modifies username and/or password
+# depending on what is given (defaults to None)
 # if successful, returns NEW account
-# else, returns None
-def modify_account(id, username):
+# else, returns None (also returns None if nothing set to change)
+def modify_account(id, username=None, password=None):
+  if username is None and password is None:
+    return None
+  
   connection = mysql.connector.connect( \
     user=os.environ.get('SQL_USER'), \
     database=os.environ.get('SQL_DATABASE'), \
@@ -221,9 +231,17 @@ def modify_account(id, username):
                 """
   )
 
+  set_args = []
+
+  if username is not None:
+    set_args.append(f'username="{username}"')
+  
+  if password is not None:
+    set_args.append(f'password_hash={hash_salt(password)}')
+
   set_query = (f"""
                UPDATE account
-               SET username="{username}"
+               SET {', '.join(set_args)}
                WHERE id={id};
                """
   )
@@ -239,8 +257,11 @@ def modify_account(id, username):
   for item in cursor:
     old_account = item
   
-  # adding comma turns middle element into typle
-  new_account = old_account[:1] + (username,) + old_account[2:]
+  # adding comma turns middle element into tuple
+  new_account = old_account[:1] + \
+                ((username,) if username is not None else (old_account[1],)) + \
+                ((hash_salt(password),) if password is not None else ('0x' + old_account[2].hex(),)) + \
+                old_account[3:]
 
   cursor.execute(set_query)
   cursor.close()
@@ -249,3 +270,34 @@ def modify_account(id, username):
   connection.close()
 
   return new_account
+
+# for authentication
+# takes username and returns list of all 
+# (id, password hash) associated 
+# if no accounts with that username, returns empty list
+def get_credentials(username):
+  connection = mysql.connector.connect( \
+    user=os.environ.get('SQL_USER'), \
+    database=os.environ.get('SQL_DATABASE'), \
+    password=os.environ.get('SQL_PASSWORD'), \
+  )
+
+  cursor = connection.cursor()
+
+  query = (f"""
+            SELECT id, password_hash FROM account
+            WHERE username={username};
+            """
+  )
+
+  cursor.execute(query)
+
+  ret = []
+
+  for item in cursor:
+    ret.append((item[0], item[1]))
+
+  cursor.close()
+  connection.close()
+
+  return ret
