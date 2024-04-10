@@ -3,7 +3,8 @@ import mysql.connector
 from dotenv import load_dotenv
 import os
 import random as rand
-from backend.sql_functions import check_balance, deposit, withdraw, create_account, delete_account, modify_account
+from backend.sql_functions import check_balance, deposit, withdraw, create_account, delete_account, modify_account, get_credentials
+from backend.authentication import authenticate
 from backend.utils import hash_salt
 
 class SQLTestCases(unittest.TestCase):
@@ -89,9 +90,56 @@ class SQLTestCases(unittest.TestCase):
 
     delete_account(acc[0])
 
+  def test_get_credentials(self):
+    acc = create_account('Test Schmo', 'password123*', 0)
+    
+    ret = get_credentials('Test Schmo')
+
+    self.assertEqual([(acc[0], acc[2])], ret)
+
+    delete_account(acc[0])
+
   def tearDown(self):
     self.cursor.close()
     self.connection.close()
+
+
+class AutheticationTestCases(unittest.TestCase):
+  def setUp(self):
+    self.acc1 = create_account('Test Schmo', 'password123*', 0)
+    self.acc2 = create_account('Test Schme', 'password234*', 0)
+    self.acc3 = create_account('Test Schma', 'password123*', 0)
+    self.acc4 = create_account('Test Schmo', 'password234*', 0)
+
+  def test_correct_auth(self):
+    ret = authenticate('Test Schmo', 'password123*')
+
+    self.assertEqual(ret, self.acc1[0])
+
+  def test_incorrect_auth(self):
+    ret = authenticate('Test Schme', 'password123*')
+
+    self.assertEqual(ret, -1)
+
+  def test_auth_user_collision(self):
+    ret1 = authenticate('Test Schmo', 'password123*')
+    ret2 = authenticate('Test Schmo', 'password234*')
+
+    self.assertEqual(ret1, self.acc1[0])
+    self.assertEqual(ret2, self.acc4[0])
+
+  def test_auth_pass_collision(self):
+    ret1 = authenticate('Test Schmo', 'password123*')
+    ret2 = authenticate('Test Schma', 'password123*')
+
+    self.assertEqual(ret1, self.acc1[0])
+    self.assertEqual(ret2, self.acc3[0])
+
+  def tearDown(self):
+    delete_account(self.acc1[0])
+    delete_account(self.acc2[0])
+    delete_account(self.acc3[0])
+    delete_account(self.acc4[0])
 
 
 if __name__ == '__main__':

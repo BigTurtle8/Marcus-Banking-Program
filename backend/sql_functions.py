@@ -286,7 +286,7 @@ def get_credentials(username):
 
   query = (f"""
             SELECT id, password_hash FROM account
-            WHERE username={username};
+            WHERE username="{username}";
             """
   )
 
@@ -295,7 +295,7 @@ def get_credentials(username):
   ret = []
 
   for item in cursor:
-    ret.append((item[0], item[1]))
+    ret.append((item[0], '0x' + item[1].hex()))
 
   cursor.close()
   connection.close()
