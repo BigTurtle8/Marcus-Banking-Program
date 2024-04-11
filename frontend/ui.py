@@ -1,5 +1,7 @@
 from backend.sql_functions import *
 
+# currently only CLI
+
 def run():
   print('Welcome to Turtle Banking!')
   

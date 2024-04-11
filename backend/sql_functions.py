@@ -5,18 +5,6 @@ from backend.utils import hash_salt
 
 load_dotenv()
 
-def test():
-  print(f'{check_balance(1):.2f}')
-  print(f'{deposit(1, 100):.2f}')
-  print(f'{withdraw(1, 2000):.2f}')
-
-  created_account = create_account('Test Schmo', 0)
-  print(f'{created_account}')
-  print(f'{modify_account(created_account[0], 'Test Schme')}')
-  print(f'{delete_account(created_account[0])}')
-
-  print(f'{delete_account(-1)}')
-
 # if account with id exists, will return float
 # otherwise returns None
 # (assumes correct data types)
@@ -271,7 +259,7 @@ def modify_account(id, username=None, password=None):
 
   return new_account
 
-# for authentication
+# for authentication, not ui
 # takes username and returns list of all 
 # (id, password hash) associated 
 # if no accounts with that username, returns empty list

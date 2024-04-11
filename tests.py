@@ -3,9 +3,101 @@ import mysql.connector
 from dotenv import load_dotenv
 import os
 import random as rand
+from frontend.input_validation import val_check_balance, val_deposit, val_withdraw, val_create_account, val_delete_account, val_modify_account
 from backend.sql_functions import check_balance, deposit, withdraw, create_account, delete_account, modify_account, get_credentials
 from backend.authentication import authenticate
 from backend.utils import hash_salt
+
+class ValidationTestCases(unittest.TestCase):
+  def test_val_check_balance(self):
+    self.assertFalse(val_check_balance(-1))
+    self.assertFalse(val_check_balance(0))
+    self.assertFalse(val_check_balance(rand.randrange(-10000, 0)))
+    
+    self.assertTrue(val_check_balance(1))
+    self.assertTrue(val_check_balance(rand.randrange(2, 10000)))
+
+  def test_val_deposit(self):
+    self.assertFalse(val_deposit(-1, 1))
+    self.assertFalse(val_deposit(0, 1))
+    
+    self.assertFalse(val_deposit(rand.randrange(-10000, 0), 1))
+    
+    self.assertTrue(val_deposit(1, 1))
+    self.assertTrue(val_deposit(rand.randrange(2, 10000), 1))
+
+    self.assertFalse(val_deposit(1, -1))
+    self.assertFalse(val_deposit(1, rand.randrange(-10000, -1)))
+
+    self.assertTrue(val_deposit(1, 1))
+    self.assertTrue(val_deposit(1, 0))
+    self.assertTrue(val_deposit(rand.randrange(1, 10000), rand.randrange(0, 10000)))
+
+    self.assertFalse(val_deposit(1, -0.5))
+    self.assertTrue(val_deposit(1, 0.5))
+
+  def test_val_withdraw(self):
+    self.assertFalse(val_withdraw(-1, 1))
+    self.assertFalse(val_withdraw(0, 1))
+    
+    self.assertFalse(val_withdraw(rand.randrange(-10000, 0), 1))
+    
+    self.assertTrue(val_withdraw(1, 1))
+    self.assertTrue(val_withdraw(rand.randrange(2, 10000), 1))
+
+    self.assertFalse(val_withdraw(1, -1))
+    self.assertFalse(val_withdraw(1, rand.randrange(-10000, -1)))
+
+    self.assertTrue(val_withdraw(1, 1))
+    self.assertTrue(val_withdraw(1, 0))
+    self.assertTrue(val_withdraw(rand.randrange(1, 10000), rand.randrange(0, 10000)))
+
+    self.assertFalse(val_withdraw(1, -0.5))
+    self.assertTrue(val_withdraw(1, 0.5))
+
+  def test_val_create_account(self):
+    self.assertFalse(val_create_account(1, 'password123*', 0))
+
+    self.assertFalse(val_create_account('Test Schmo', 1, 0))
+
+    self.assertFalse(val_create_account('Test Schmo', 'password123*', 'user'))
+    self.assertFalse(val_create_account('Test Schmo', 'password123*', 2))
+    self.assertFalse(val_create_account('Test Schmo', 'password123*', 1.0))
+
+    self.assertTrue(val_create_account('Test Schmo', 'password123*', 0))
+    self.assertTrue(val_create_account('Test Schmo', 'password123*', 1))
+    self.assertTrue(val_create_account('Test Schmo', 'password123*', True))
+    self.assertTrue(val_create_account('Test Schmo', 'password123*', False))
+    
+  def test_val_delete_account(self):
+    self.assertFalse(val_delete_account(-1))
+    self.assertFalse(val_delete_account(0))
+    self.assertFalse(val_delete_account(rand.randrange(-10000, 0)))
+    
+    self.assertTrue(val_delete_account(1))
+    self.assertTrue(val_delete_account(rand.randrange(2, 10000)))
+
+  def test_val_modify_account(self):
+    self.assertFalse(val_modify_account(-1, 'Test Schmo', 'password123*'))
+    self.assertFalse(val_modify_account(0, 'Test Schmo', 'password123*'))
+    self.assertFalse(val_modify_account(-1, 'Test Schmo'))
+    self.assertFalse(val_modify_account(0, 'Test Schmo'))
+    self.assertFalse(val_modify_account(-1, username='Test Schmo'))
+    self.assertFalse(val_modify_account(0, username='Test Schmo'))
+    self.assertFalse(val_modify_account(-1, password='password123*'))
+    self.assertFalse(val_modify_account(0, password='password123*'))
+
+    self.assertFalse(val_modify_account(1, 1, 'password123*'))
+    self.assertFalse(val_modify_account(1, 1))
+    self.assertFalse(val_modify_account(1, username=1))
+
+    self.assertFalse(val_modify_account(1, 'Test Schmo', 1))
+    self.assertFalse(val_modify_account(1, password=1))
+
+    self.assertTrue(val_modify_account(1, 'Test Schmo', 'password123*'))
+    self.assertTrue(val_modify_account(1, 'Test Schmo'))
+    self.assertTrue(val_modify_account(1, username='Test Schmo'))
+    self.assertTrue(val_modify_account(1, password='password123*'))
 
 class SQLTestCases(unittest.TestCase):
   def setUp(self):
