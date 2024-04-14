@@ -5,18 +5,6 @@ from backend.utils import hash_salt
 
 load_dotenv()
 
-def test():
-  print(f'{check_balance(1):.2f}')
-  print(f'{deposit(1, 100):.2f}')
-  print(f'{withdraw(1, 2000):.2f}')
-
-  created_account = create_account('Test Schmo', 0)
-  print(f'{created_account}')
-  print(f'{modify_account(created_account[0], 'Test Schme')}')
-  print(f'{delete_account(created_account[0])}')
-
-  print(f'{delete_account(-1)}')
-
 # if account with id exists, will return float
 # otherwise returns None
 # (assumes correct data types)
@@ -39,8 +27,9 @@ def check_balance(id):
 
   bal = None
 
+  # have to type cast or else errors with SQL
   for item in cursor:
-    bal = item[0]
+    bal = float(item[0])
 
   cursor.close()
   connection.close()
@@ -271,7 +260,68 @@ def modify_account(id, username=None, password=None):
 
   return new_account
 
-# for authentication
+# for admins only
+# returns list of tuples
+# representing all accounts
+# (except for password_hash)
+def get_accounts():
+  connection = mysql.connector.connect( \
+    user=os.environ.get('SQL_USER'), \
+    database=os.environ.get('SQL_DATABASE'), \
+    password=os.environ.get('SQL_PASSWORD'), \
+  )
+
+  cursor = connection.cursor()
+
+  query = (f"""
+            SELECT id, username, balance, is_admin FROM account;
+            """
+  )
+
+  cursor.execute(query)
+
+  ret = []
+
+  for item in cursor:
+    ret.append((item[0], item[1], float(item[2]), item[3]))
+
+  cursor.close()
+  connection.close()
+
+  return ret
+
+# for admins only
+# returns tuple of account (except password_hash) 
+# given id
+# if invalid id then returns None
+def get_account(id):
+  connection = mysql.connector.connect( \
+    user=os.environ.get('SQL_USER'), \
+    database=os.environ.get('SQL_DATABASE'), \
+    password=os.environ.get('SQL_PASSWORD'), \
+  )
+
+  cursor = connection.cursor()
+
+  query = (f"""
+            SELECT id, username, balance, is_admin FROM account
+            WHERE id={id};
+            """
+  )
+
+  cursor.execute(query)
+
+  ret = None
+
+  for item in cursor:
+    ret = (item[0], item[1], float(item[2]), item[3])
+
+  cursor.close()
+  connection.close()
+
+  return ret
+
+# for authentication, not ui
 # takes username and returns list of all 
 # (id, password hash) associated 
 # if no accounts with that username, returns empty list
@@ -285,8 +335,8 @@ def get_credentials(username):
   cursor = connection.cursor()
 
   query = (f"""
-            SELECT id, password_hash FROM account
-            WHERE username={username};
+            SELECT id, password_hash, is_admin FROM account
+            WHERE username="{username}";
             """
   )
 
@@ -295,7 +345,7 @@ def get_credentials(username):
   ret = []
 
   for item in cursor:
-    ret.append((item[0], item[1]))
+    ret.append((item[0], '0x' + item[1].hex(), item[2]))
 
   cursor.close()
   connection.close()
