@@ -79,3 +79,9 @@ def val_modify_account(id, username=None, password=None):
     return False
   
   return True
+
+def val_get_account(id):
+  if not isinstance(id, int) or id <= 0:
+    return False
+
+  return True

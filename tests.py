@@ -3,8 +3,8 @@ import mysql.connector
 from dotenv import load_dotenv
 import os
 import random as rand
-from frontend.input_validation import val_check_balance, val_deposit, val_withdraw, val_create_account, val_delete_account, val_modify_account
-from backend.sql_functions import check_balance, deposit, withdraw, create_account, delete_account, modify_account, get_credentials
+from frontend.input_validation import val_check_balance, val_deposit, val_withdraw, val_create_account, val_delete_account, val_modify_account, val_get_account
+from backend.sql_functions import check_balance, deposit, withdraw, create_account, delete_account, modify_account, get_credentials, get_accounts, get_account
 from backend.authentication import authenticate
 from backend.utils import hash_salt
 
@@ -99,6 +99,14 @@ class ValidationTestCases(unittest.TestCase):
     self.assertTrue(val_modify_account(1, username='Test Schmo'))
     self.assertTrue(val_modify_account(1, password='password123*'))
 
+  def test_val_get_account(self):
+    self.assertFalse(val_check_balance(-1))
+    self.assertFalse(val_check_balance(0))
+    self.assertFalse(val_check_balance(rand.randrange(-10000, 0)))
+    
+    self.assertTrue(val_check_balance(1))
+    self.assertTrue(val_check_balance(rand.randrange(2, 10000)))
+
 class SQLTestCases(unittest.TestCase):
   def setUp(self):
     load_dotenv()
@@ -188,6 +196,24 @@ class SQLTestCases(unittest.TestCase):
     ret = get_credentials('Test Schmo')
 
     self.assertEqual([(acc[0], acc[2], 0)], ret)
+
+    delete_account(acc[0])
+
+  def test_get_accounts(self):
+    acc = create_account('Test Schmo', 'password123*', 0)
+
+    ret = get_accounts()
+
+    self.assertIn((acc[0], acc[1], 0, acc[4]), ret)
+
+    delete_account(acc[0])
+
+  def test_get_account(self):
+    acc = create_account('Test Schmo', 'password123*', 0)
+
+    ret = get_account(acc[0])
+
+    self.assertEqual((acc[0], acc[1], 0, acc[4]), ret)
 
     delete_account(acc[0])
 

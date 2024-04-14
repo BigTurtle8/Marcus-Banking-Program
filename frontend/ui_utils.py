@@ -3,7 +3,6 @@ def print_catastrophic_error():
   print('-' * 20)
   print('Something went very wrong. Please report this to an admin at your earliest convenience.')
   print('-' * 20)
-  print()
 
 def is_number(num):
   try:

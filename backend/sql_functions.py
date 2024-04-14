@@ -260,6 +260,67 @@ def modify_account(id, username=None, password=None):
 
   return new_account
 
+# for admins only
+# returns list of tuples
+# representing all accounts
+# (except for password_hash)
+def get_accounts():
+  connection = mysql.connector.connect( \
+    user=os.environ.get('SQL_USER'), \
+    database=os.environ.get('SQL_DATABASE'), \
+    password=os.environ.get('SQL_PASSWORD'), \
+  )
+
+  cursor = connection.cursor()
+
+  query = (f"""
+            SELECT id, username, balance, is_admin FROM account;
+            """
+  )
+
+  cursor.execute(query)
+
+  ret = []
+
+  for item in cursor:
+    ret.append((item[0], item[1], float(item[2]), item[3]))
+
+  cursor.close()
+  connection.close()
+
+  return ret
+
+# for admins only
+# returns tuple of account (except password_hash) 
+# given id
+# if invalid id then returns None
+def get_account(id):
+  connection = mysql.connector.connect( \
+    user=os.environ.get('SQL_USER'), \
+    database=os.environ.get('SQL_DATABASE'), \
+    password=os.environ.get('SQL_PASSWORD'), \
+  )
+
+  cursor = connection.cursor()
+
+  query = (f"""
+            SELECT id, username, balance, is_admin FROM account
+            WHERE id={id};
+            """
+  )
+
+  cursor.execute(query)
+
+  ret = None
+
+  for item in cursor:
+    ret = (item[0], item[1], float(item[2]), item[3])
+
+  cursor.close()
+  connection.close()
+
+  return ret
+
 # for authentication, not ui
 # takes username and returns list of all 
 # (id, password hash) associated 
