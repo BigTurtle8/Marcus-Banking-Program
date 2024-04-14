@@ -187,7 +187,7 @@ class SQLTestCases(unittest.TestCase):
     
     ret = get_credentials('Test Schmo')
 
-    self.assertEqual([(acc[0], acc[2])], ret)
+    self.assertEqual([(acc[0], acc[2], 0)], ret)
 
     delete_account(acc[0])
 
@@ -202,11 +202,12 @@ class AutheticationTestCases(unittest.TestCase):
     self.acc2 = create_account('Test Schme', 'password234*', 0)
     self.acc3 = create_account('Test Schma', 'password123*', 0)
     self.acc4 = create_account('Test Schmo', 'password234*', 0)
+    self.acc5 = create_account('Test Schmo', 'password456*', 1)
 
   def test_correct_auth(self):
     ret = authenticate('Test Schmo', 'password123*')
 
-    self.assertEqual(ret, self.acc1[0])
+    self.assertEqual(ret, (self.acc1[0], 0))
 
   def test_incorrect_auth(self):
     ret = authenticate('Test Schme', 'password123*')
@@ -217,21 +218,27 @@ class AutheticationTestCases(unittest.TestCase):
     ret1 = authenticate('Test Schmo', 'password123*')
     ret2 = authenticate('Test Schmo', 'password234*')
 
-    self.assertEqual(ret1, self.acc1[0])
-    self.assertEqual(ret2, self.acc4[0])
+    self.assertEqual(ret1, (self.acc1[0], 0))
+    self.assertEqual(ret2, (self.acc4[0], 0))
 
   def test_auth_pass_collision(self):
     ret1 = authenticate('Test Schmo', 'password123*')
     ret2 = authenticate('Test Schma', 'password123*')
 
-    self.assertEqual(ret1, self.acc1[0])
-    self.assertEqual(ret2, self.acc3[0])
+    self.assertEqual(ret1, (self.acc1[0], 0))
+    self.assertEqual(ret2, (self.acc3[0], 0))
+
+  def test_auth_admin(self):
+    ret = authenticate('Test Schmo', 'password456*')
+
+    self.assertEqual(ret, (self.acc5[0], 1))
 
   def tearDown(self):
     delete_account(self.acc1[0])
     delete_account(self.acc2[0])
     delete_account(self.acc3[0])
     delete_account(self.acc4[0])
+    delete_account(self.acc5[0])
 
 
 if __name__ == '__main__':

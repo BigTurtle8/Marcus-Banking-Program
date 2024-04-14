@@ -14,8 +14,8 @@ def authenticate(username, password):
   if len(hashes) == 0:
     return None
   
-  for id, hash in hashes:
+  for id, hash, is_admin in hashes:
     if hash == password_hash:
-      return id
+      return (id, is_admin)
     
   return -1

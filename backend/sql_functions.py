@@ -27,8 +27,9 @@ def check_balance(id):
 
   bal = None
 
+  # have to type cast or else errors with SQL
   for item in cursor:
-    bal = item[0]
+    bal = float(item[0])
 
   cursor.close()
   connection.close()
@@ -273,7 +274,7 @@ def get_credentials(username):
   cursor = connection.cursor()
 
   query = (f"""
-            SELECT id, password_hash FROM account
+            SELECT id, password_hash, is_admin FROM account
             WHERE username="{username}";
             """
   )
@@ -283,7 +284,7 @@ def get_credentials(username):
   ret = []
 
   for item in cursor:
-    ret.append((item[0], '0x' + item[1].hex()))
+    ret.append((item[0], '0x' + item[1].hex(), item[2]))
 
   cursor.close()
   connection.close()
