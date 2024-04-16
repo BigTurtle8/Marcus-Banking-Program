@@ -5,6 +5,12 @@ from frontend.admin_functions import do_admin_loop
 from frontend.input_validation import val_create_account
 from frontend.ui_utils import print_catastrophic_error
 
+'''
+Using various backend authentication functions, verifies
+the user's identity before directing them to either 
+the user or admin actions.
+'''
+
 def do_login_loop():
   while True:
     print()

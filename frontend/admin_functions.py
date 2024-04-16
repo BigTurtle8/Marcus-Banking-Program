@@ -2,6 +2,16 @@ from backend.sql_functions import get_accounts, get_account, delete_account
 from frontend.input_validation import val_get_account
 from frontend.ui_utils import print_catastrophic_error
 
+'''
+Contains the user interface for how admin users of the application
+can interact with the program.
+
+NOTE: There is NO way within the program to turn a user into 
+an admin intentionally. This should be done manually through the SQL
+database, choosing an account, and changing their is_admin column 
+value from 0 to 1.
+'''
+
 def do_admin_loop(id, username):
   while True:
     choice = ask_admin_menu(username)

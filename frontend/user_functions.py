@@ -3,6 +3,11 @@ from backend.authentication import authenticate
 from frontend.input_validation import val_check_balance, val_deposit, val_withdraw, val_modify_account, val_delete_account
 from frontend.ui_utils import print_catastrophic_error, is_number
 
+'''
+Contains the user interface for how regular users of the application
+can interact with the program.
+'''
+
 def do_user_loop(id, username):
   while True:
     choice = ask_user_menu(username)

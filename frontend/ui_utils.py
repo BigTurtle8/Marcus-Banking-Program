@@ -1,3 +1,8 @@
+'''
+Useful functions for anything specifically relevant to user interface
+or to be used mainly in creating user interfaces.
+'''
+
 def print_catastrophic_error():
   print()
   print('-' * 20)

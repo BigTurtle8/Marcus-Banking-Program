@@ -2,7 +2,10 @@ from backend.sql_functions import *
 from frontend.input_validation import *
 from frontend.auth_functions import do_login_loop, do_signup_loop
 
-# currently only CLI
+'''
+Only has a Command Line Interface for now.
+Provides the beginning and start of user experience.
+'''
 
 def run():
   print('|' + '-' * 28 + '|')
