@@ -1,6 +1,11 @@
 from backend.sql_functions import get_credentials
 from backend.utils import hash_salt
 
+'''
+Contains functions needed solely for authentication
+that don't directly use a connection to SQL. 
+'''
+
 # takes in strings of username and password
 # and if account exists, returns corresponding id
 # if account exists but incorrect password, returns -1

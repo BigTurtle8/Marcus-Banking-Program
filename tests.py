@@ -8,6 +8,13 @@ from backend.sql_functions import check_balance, deposit, withdraw, create_accou
 from backend.authentication import authenticate
 from backend.utils import hash_salt
 
+'''
+Contains unit testing for various functions.
+Most importantly, tests functions that connect to SQL database.
+Run `python .\tests.py` in order to check against all tests!
+'''
+
+
 class ValidationTestCases(unittest.TestCase):
   def test_val_check_balance(self):
     self.assertFalse(val_check_balance(-1))

@@ -1,5 +1,8 @@
-# helper methods to for ui.py to use before inputting sql_functions.py
-# ONLY checks argument types, not if works with database (already done in sql_functions.py)
+'''
+Helper methods to for ui.py to use before inputting sql_functions.py
+ONLY checks argument types, not if those arguments
+work with database (already done in sql_functions.py).
+'''
 
 # checks if id is int that is at least 1
 # returns true if OK, else false

@@ -1,5 +1,9 @@
 from hashlib import pbkdf2_hmac
 
+'''
+Contains useful functions for anything relating to the backend.
+'''
+
 # note: pbkdf2_hmac is hash and salt method for password
 # hash_iters increases security but also time
 HASH_ITERS = 1000
